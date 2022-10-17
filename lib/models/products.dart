@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 class Product{
   final String id;
   final String title;
@@ -12,6 +11,6 @@ class Product{
     required this.description,
     required this.imageUrl,
     required this.price,
-    required this.isFavorite,
+    this.isFavorite = false,
 });
 }
