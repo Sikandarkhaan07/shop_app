@@ -1,6 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+enum SelectedSize{
+  smallSize,
+  mediumSize,
+  largeSize,
+}
+
+
 class CartItem {
   final String id;
   final String title;
@@ -21,6 +28,7 @@ class Cart with ChangeNotifier {
   Map<String, CartItem> get cartItem {
     return {..._cartItem};
   }
+
 
   int get itemCount {
     return _cartItem.length;
@@ -78,5 +86,9 @@ class Cart with ChangeNotifier {
       );
       notifyListeners();
     }
+  }
+  void clear(){
+    _cartItem = {};
+    notifyListeners();
   }
 }

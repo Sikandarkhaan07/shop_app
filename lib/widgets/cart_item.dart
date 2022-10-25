@@ -45,7 +45,7 @@ class CartItem extends StatelessWidget {
         elevation: 5,
         margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
         child: Padding(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(4),
           child: ListTile(
             leading: CircleAvatar(
               radius: 30,
@@ -57,37 +57,63 @@ class CartItem extends StatelessWidget {
             ),
             title: Text(title),
             subtitle: Text('Total: ${(price * quantity).toStringAsFixed(2)}'),
-            trailing: SizedBox(
-              width: 100,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  CircleAvatar(
-                    radius: 15,
-                    child: IconButton(
-                      icon: const Icon(Icons.remove),
-                      onPressed: () {
-                        cartProduct.addRemoveItem(productId, '-');
-                      },
-                        padding: const EdgeInsets.all(0),
-                    ),
+            trailing: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                  width: 100,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 15,
+                        child: IconButton(
+                          icon: const Icon(Icons.remove),
+                          onPressed: () {
+                            cartProduct.addRemoveItem(productId, '-');
+                          },
+                          padding: const EdgeInsets.all(0),
+                        ),
+                      ),
+                      Text(
+                        '${quantity}x',
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      CircleAvatar(
+                        radius: 15,
+                        child: IconButton(
+                            icon: const Icon(Icons.add),
+                            onPressed: () {
+                              cartProduct.addRemoveItem(productId, '+');
+                            },
+                            padding: const EdgeInsets.all(0)),
+                      ),
+                    ],
                   ),
-                  Text(
-                    '${quantity}x',
-                    style: const TextStyle(fontSize: 18),
+                ),
+                SizedBox(
+                  width: 100,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // crossAxisAlignment: CrossAxisAlignment.center,
+                    children: const [
+                      CircleAvatar(
+                        radius: 12,
+                        child: Text('S'),
+                      ),
+                      CircleAvatar(
+                        radius: 12,
+                        child: Text('M'),
+                      ),
+                      CircleAvatar(
+                        radius: 12,
+                        child: Text('L'),
+                      ),
+                    ],
                   ),
-                  CircleAvatar(
-                    radius: 15,
-                    child: IconButton(
-                        icon: const Icon(Icons.add),
-                        onPressed: () {
-                          cartProduct.addRemoveItem(productId, '+');
-                        },
-                        padding: const EdgeInsets.all(0)),
-                  ),
-                ],
-              ),
+                )
+              ],
             ),
           ),
         ),
