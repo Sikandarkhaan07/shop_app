@@ -1,34 +1,33 @@
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-enum SelectedSize{
+enum SelectedSize {
   smallSize,
   mediumSize,
   largeSize,
 }
 
-
 class CartItem {
   final String id;
   final String title;
-  late final int quantity;
+  final int quantity;
   final double price;
 
   CartItem({
-    required this.id,
-    required this.title,
-    required this.price,
-    required this.quantity,
+    @required this.id,
+    @required this.title,
+    @required this.price,
+    @required this.quantity,
   });
 }
 
 class Cart with ChangeNotifier {
-  late Map<String, CartItem> _cartItem = {};
+  Map<String, CartItem> _cartItem = {};
 
   Map<String, CartItem> get cartItem {
     return {..._cartItem};
   }
-
 
   int get itemCount {
     return _cartItem.length;
@@ -81,13 +80,35 @@ class Cart with ChangeNotifier {
           price: existingItem.price,
           quantity: operator == '+'
               ? existingItem.quantity + 1
-              : existingItem.quantity > 1 ? existingItem.quantity - 1 : existingItem.quantity,
+              : existingItem.quantity > 1
+                  ? existingItem.quantity - 1
+                  : existingItem.quantity,
         ),
       );
       notifyListeners();
     }
   }
-  void clear(){
+
+  void removeSingleItem(String productId) {
+    if (!_cartItem.containsKey(productId)) {
+      return;
+    }
+    if (_cartItem[productId].quantity > 1) {
+      _cartItem.update(
+          productId,
+          (existingCartItem) => CartItem(
+                id: existingCartItem.id,
+                title: existingCartItem.title,
+                price: existingCartItem.price,
+                quantity: existingCartItem.quantity - 1,
+              ),);
+    }else{
+      _cartItem.remove(productId);
+    }
+    notifyListeners();
+  }
+
+  void clear() {
     _cartItem = {};
     notifyListeners();
   }
