@@ -1,6 +1,8 @@
 // ignore_for_file: prefer_final_fields
-
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'products.dart';
 
 class ProductsProvider with ChangeNotifier {
@@ -38,6 +40,7 @@ class ProductsProvider with ChangeNotifier {
           'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
     ),
   ];
+
   //
   // var _showFavoritesOnly = false;
 
@@ -47,7 +50,8 @@ class ProductsProvider with ChangeNotifier {
     // }
     return [..._items];
   }
-  List<Product> get onlyFavoritesItem{
+
+  List<Product> get onlyFavoritesItem {
     return _items.where((productItem) => productItem.isFavorite).toList();
   }
 
@@ -60,12 +64,55 @@ class ProductsProvider with ChangeNotifier {
   //   notifyListeners();
   // }
 
-  Product findById(String id){
+  Product findById(String id) {
     return _items.firstWhere((product) => product.id == id);
   }
 
-  void addProduct() {
-    //_items.add(value);
+  Future<void> addProduct(Product product) {
+    const url =
+        'https://first-demo-project-9ab48-default-rtdb.firebaseio.com/products.json';
+    return http
+        .post(
+      Uri.parse(url),
+      body: json.encode(
+        {
+          'title': product.title,
+          'description': product.description,
+          'imageUrl': product.imageUrl,
+          'price': product.price,
+          'isFavorite': product.isFavorite,
+        },
+      ),
+    )
+        .then((response) {
+      print(json.decode(response.body));
+      final newProduct = Product(
+        id: json.decode(response.body)['name'],
+        title: product.title,
+        description: product.description,
+        imageUrl: product.imageUrl,
+        price: product.price,
+      );
+      _items.add(newProduct);
+      notifyListeners();
+    }).catchError((err) {
+      print(err);
+      throw err;
+    });
+  }
+
+  void updateProduct(String id, Product newProduct) {
+    final productIndex = _items.indexWhere((element) => element.id == id);
+    if (productIndex >= 0) {
+      _items[productIndex] = newProduct;
+    } else {
+      print('not found product.');
+    }
+    notifyListeners();
+  }
+
+  void deleteProduct(String id) {
+    _items.removeWhere((element) => element.id == id);
     notifyListeners();
   }
 }
