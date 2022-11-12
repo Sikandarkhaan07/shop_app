@@ -6,6 +6,7 @@ import '../providers/cart.dart';
 import '../widgets/product_grid.dart';
 import '../widgets/badge.dart';
 import '../widgets/app_drawer.dart';
+import '../providers/products_provider.dart';
 
 enum filterOptions {
   favorite,
@@ -13,13 +14,38 @@ enum filterOptions {
 }
 
 class ProductOverviewScreen extends StatefulWidget {
-
   @override
   State<ProductOverviewScreen> createState() => _ProductOverviewScreenState();
 }
 
 class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
   var _showOnlyFavorite = false;
+  var _isLoading = false;
+  //another approach for the below initstate method
+  var _isInit = true;
+  @override
+  void didChangeDependencies() {
+    if(_isInit){
+      setState((){
+        _isLoading = true;
+      });
+      Provider.of<ProductsProvider>(context,listen: false).fetchAndSetProducts().then((_){
+        setState((){
+          _isLoading = false;
+        });
+      });
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
+
+  // @override
+  // void initState() {
+  //   Future.delayed(Duration.zero).then((_) {
+  //     Provider.of<ProductsProvider>(context).fetchAndSetProducts();
+  //   });
+  //   super.initState();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +76,7 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
             ],
           ),
           Consumer<Cart>(
-            builder: (_, cartData,ch) => Badge(
+            builder: (_, cartData, ch) => Badge(
               value: cartData.itemCount.toString(),
               child: IconButton(
                 onPressed: () {
@@ -65,7 +91,7 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
         ],
       ),
       drawer: AppDrawer(),
-      body: product_grid(_showOnlyFavorite),
+      body: _isLoading ? const Center(child: CircularProgressIndicator(),) : product_grid(_showOnlyFavorite),
     );
   }
 }
