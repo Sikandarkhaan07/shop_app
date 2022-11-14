@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth.dart';
-import '../models/HttpException.dart  ';
 
 enum AuthMode { Signup, Login }
 
@@ -123,6 +122,7 @@ class _AuthCardState extends State<AuthCard> {
   }
 
   Future<void> _submit() async {
+    print('logging in');
     if (!_formKey.currentState.validate()) {
       // Invalid!
       return;
