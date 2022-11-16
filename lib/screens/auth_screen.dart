@@ -67,7 +67,7 @@ class AuthScreen extends StatelessWidget {
                         'MyShop',
                         style: TextStyle(
                           color:
-                              Theme.of(context).accentTextTheme.subtitle1.color,
+                          Theme.of(context).accentTextTheme.subtitle1.color,
                           fontSize: 50,
                           fontFamily: 'Anton',
                           fontWeight: FontWeight.normal,
@@ -108,17 +108,17 @@ class _AuthCardState extends State<AuthCard> {
     showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-              title: const Text('An error occurred'),
-              content: Text(message),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(ctx).pop();
-                  },
-                  child: const Text('Okay'),
-                ),
-              ],
-            ));
+          title: const Text('An error occurred'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+              },
+              child: const Text('Okay'),
+            ),
+          ],
+        ));
   }
 
   Future<void> _submit() async {
@@ -146,7 +146,7 @@ class _AuthCardState extends State<AuthCard> {
       var errorMessage = 'Authentication failed!';
       if (error.toString().contains('EMAIL_EXISTS')) {
         errorMessage =
-            'This email address is already in use, Please try another';
+        'This email address is already in use, Please try another';
       } else if (error.toString().contains('INVALID_EMAIL')) {
         errorMessage = 'This is not a valid email address';
       } else if (error.toString().contains('WEAK_PASSWORD')) {
@@ -189,7 +189,7 @@ class _AuthCardState extends State<AuthCard> {
       child: Container(
         height: _authMode == AuthMode.Signup ? 320 : 260,
         constraints:
-            BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 320 : 260),
+        BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 320 : 260),
         width: deviceSize.width * 0.75,
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -227,14 +227,14 @@ class _AuthCardState extends State<AuthCard> {
                   TextFormField(
                     enabled: _authMode == AuthMode.Signup,
                     decoration:
-                        const InputDecoration(labelText: 'Confirm Password'),
+                    const InputDecoration(labelText: 'Confirm Password'),
                     obscureText: true,
                     validator: _authMode == AuthMode.Signup
                         ? (value) {
-                            if (value != _passwordController.text) {
-                              return 'Passwords do not match!';
-                            }
-                          }
+                      if (value != _passwordController.text) {
+                        return 'Passwords do not match!';
+                      }
+                    }
                         : null,
                   ),
                 const SizedBox(
@@ -253,12 +253,12 @@ class _AuthCardState extends State<AuthCard> {
                     color: Theme.of(context).primaryColor,
                     textColor: Theme.of(context).primaryTextTheme.button.color,
                     child:
-                        Text(_authMode == AuthMode.Login ? 'LOGIN' : 'SIGN UP'),
+                    Text(_authMode == AuthMode.Login ? 'LOGIN' : 'SIGN UP'),
                   ),
                 FlatButton(
                   onPressed: _switchAuthMode,
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 30.0, vertical: 4),
+                  const EdgeInsets.symmetric(horizontal: 30.0, vertical: 4),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   textColor: Theme.of(context).primaryColor,
                   child: Text(
