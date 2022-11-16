@@ -55,7 +55,13 @@ class MyApp extends StatelessWidget {
           ),
           home: auth.isAuthenticated
               ? ProductOverviewScreen()
-              : const AuthScreen(),
+              : FutureBuilder(
+                  future: auth.autoLogin(),
+                  builder: (ctx, authResultSnap) =>
+                      authResultSnap.connectionState == ConnectionState.waiting
+                          ? const Splash_screen()
+                          : const AuthScreen(),
+                ),
           routes: {
             ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
             CartScreen.routeName: (ctx) => CartScreen(),
@@ -66,5 +72,16 @@ class MyApp extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class Splash_screen extends StatelessWidget {
+  const Splash_screen({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text('Loading...');
   }
 }
