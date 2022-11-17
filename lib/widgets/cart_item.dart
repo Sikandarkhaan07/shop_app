@@ -1,144 +1,89 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../providers/cart.dart';
 
 class CartItem extends StatelessWidget {
   final String id;
   final String productId;
-  final String title;
   final double price;
   final int quantity;
+  final String title;
 
-  CartItem({
-    @required this.productId,
-    @required this.quantity,
-    @required this.price,
-    @required this.title,
-    @required this.id,
-  });
+  CartItem(
+    this.id,
+    this.productId,
+    this.price,
+    this.quantity,
+    this.title,
+  );
 
   @override
   Widget build(BuildContext context) {
-    final cartProduct = Provider.of<Cart>(context);
     return Dismissible(
       key: ValueKey(id),
-      direction: DismissDirection.endToStart,
       background: Container(
         color: Theme.of(context).errorColor,
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(
-          right: 20,
-        ),
-        margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
-        child: const Icon(
+        child: Icon(
           Icons.delete,
-          size: 40,
           color: Colors.white,
+          size: 40,
+        ),
+        alignment: Alignment.centerRight,
+        padding: EdgeInsets.only(right: 20),
+        margin: EdgeInsets.symmetric(
+          horizontal: 15,
+          vertical: 4,
         ),
       ),
-      onDismissed: (direction) {
-        cartProduct.removeItem(productId);
-      },
+      direction: DismissDirection.endToStart,
       confirmDismiss: (direction) {
         return showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: const Text('Are you sure?'),
-            content: const Text('Do you really want to remove this item?'),
-            elevation: 5,
-            actions: [
-              FlatButton(
-                onPressed: () {
-                  Navigator.of(ctx).pop(false);
-                },
-                child: const Text('No'),
+                title: Text('Are you sure?'),
+                content: Text(
+                  'Do you want to remove the item from the cart?',
+                ),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('No'),
+                    onPressed: () {
+                      Navigator.of(ctx).pop(false);
+                    },
+                  ),
+                  FlatButton(
+                    child: Text('Yes'),
+                    onPressed: () {
+                      Navigator.of(ctx).pop(true);
+                    },
+                  ),
+                ],
               ),
-              FlatButton(
-                onPressed: () {
-                  Navigator.of(ctx).pop(true);
-                },
-                child: const Text('Yes'),
-              ),
-            ],
-          ),
         );
       },
+      onDismissed: (direction) {
+        Provider.of<Cart>(context, listen: false).removeItem(productId);
+      },
       child: Card(
-        elevation: 5,
-        margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+        margin: EdgeInsets.symmetric(
+          horizontal: 15,
+          vertical: 4,
+        ),
         child: Padding(
-          padding: const EdgeInsets.all(4),
+          padding: EdgeInsets.all(8),
           child: ListTile(
             leading: CircleAvatar(
-              radius: 30,
-              child: FittedBox(
-                child: Text(
-                  '\$${price.toStringAsFixed(2)}',
+              child: Padding(
+                padding: EdgeInsets.all(5),
+                child: FittedBox(
+                  child: Text('\$$price'),
                 ),
               ),
             ),
             title: Text(title),
-            subtitle: Text('Total: ${(price * quantity).toStringAsFixed(2)}'),
-            trailing: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SizedBox(
-                  width: 100,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      CircleAvatar(
-                        radius: 15,
-                        child: IconButton(
-                          icon: const Icon(Icons.remove),
-                          onPressed: () {
-                            cartProduct.addRemoveItem(productId, '-');
-                          },
-                          padding: const EdgeInsets.all(0),
-                        ),
-                      ),
-                      Text(
-                        '${quantity}x',
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                      CircleAvatar(
-                        radius: 15,
-                        child: IconButton(
-                            icon: const Icon(Icons.add),
-                            onPressed: () {
-                              cartProduct.addRemoveItem(productId, '+');
-                            },
-                            padding: const EdgeInsets.all(0)),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  width: 100,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    // crossAxisAlignment: CrossAxisAlignment.center,
-                    children: const [
-                      CircleAvatar(
-                        radius: 12,
-                        child: Text('S'),
-                      ),
-                      CircleAvatar(
-                        radius: 12,
-                        child: Text('M'),
-                      ),
-                      CircleAvatar(
-                        radius: 12,
-                        child: Text('L'),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
+            subtitle: Text('Total: \$${(price * quantity)}'),
+            trailing: Text('$quantity x'),
           ),
         ),
       ),

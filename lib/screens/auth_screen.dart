@@ -1,11 +1,10 @@
-// ignore_for_file: prefer_final_fields
-
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth.dart';
+import '../models/http_exception.dart';
 
 enum AuthMode { Signup, Login }
 
@@ -47,8 +46,8 @@ class AuthScreen extends StatelessWidget {
                   Flexible(
                     child: Container(
                       margin: const EdgeInsets.only(bottom: 20.0),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 8.0, horizontal: 94.0),
+                      padding:
+                          const EdgeInsets.symmetric(vertical: 8.0, horizontal: 94.0),
                       transform: Matrix4.rotationZ(-8 * pi / 180)
                         ..translate(-10.0),
                       // ..translate(-10.0),
@@ -66,8 +65,7 @@ class AuthScreen extends StatelessWidget {
                       child: Text(
                         'MyShop',
                         style: TextStyle(
-                          color:
-                          Theme.of(context).accentTextTheme.subtitle1.color,
+                          color: Theme.of(context).accentTextTheme.subtitle1.color,
                           fontSize: 50,
                           fontFamily: 'Anton',
                           fontWeight: FontWeight.normal,
@@ -77,7 +75,7 @@ class AuthScreen extends StatelessWidget {
                   ),
                   Flexible(
                     flex: deviceSize.width > 600 ? 2 : 1,
-                    child: AuthCard(),
+                    child: const AuthCard(),
                   ),
                 ],
               ),
@@ -90,6 +88,10 @@ class AuthScreen extends StatelessWidget {
 }
 
 class AuthCard extends StatefulWidget {
+  const AuthCard({
+    Key key,
+  }) : super(key: key);
+
   @override
   _AuthCardState createState() => _AuthCardState();
 }
@@ -104,25 +106,25 @@ class _AuthCardState extends State<AuthCard> {
   var _isLoading = false;
   final _passwordController = TextEditingController();
 
-  void _showDialog(String message) {
+  void _showErrorDialog(String message) {
     showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('An error occurred'),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(ctx).pop();
-              },
-              child: const Text('Okay'),
-            ),
-          ],
-        ));
+      context: context,
+      builder: (ctx) => AlertDialog(
+            title: const Text('An Error Occurred!'),
+            content: Text(message),
+            actions: <Widget>[
+              FlatButton(
+                child: const Text('Okay'),
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                },
+              )
+            ],
+          ),
+    );
   }
 
   Future<void> _submit() async {
-    print('logging in');
     if (!_formKey.currentState.validate()) {
       // Invalid!
       return;
@@ -131,34 +133,38 @@ class _AuthCardState extends State<AuthCard> {
     setState(() {
       _isLoading = true;
     });
-
     try {
       if (_authMode == AuthMode.Login) {
         // Log user in
-        await Provider.of<Auth>(context, listen: false)
-            .login(_authData['email'], _authData['password']);
+        await Provider.of<Auth>(context, listen: false).login(
+          _authData['email'],
+          _authData['password'],
+        );
       } else {
         // Sign user up
-        await Provider.of<Auth>(context, listen: false)
-            .signup(_authData['email'], _authData['password']);
+        await Provider.of<Auth>(context, listen: false).signup(
+          _authData['email'],
+          _authData['password'],
+        );
       }
-    } catch (error) {
-      var errorMessage = 'Authentication failed!';
+    } on HttpException catch (error) {
+      var errorMessage = 'Authentication failed';
       if (error.toString().contains('EMAIL_EXISTS')) {
-        errorMessage =
-        'This email address is already in use, Please try another';
+        errorMessage = 'This email address is already in use.';
       } else if (error.toString().contains('INVALID_EMAIL')) {
         errorMessage = 'This is not a valid email address';
       } else if (error.toString().contains('WEAK_PASSWORD')) {
-        errorMessage = 'This password is too weak';
+        errorMessage = 'This password is too weak.';
       } else if (error.toString().contains('EMAIL_NOT_FOUND')) {
-        errorMessage = 'Could not find a user with that email address';
+        errorMessage = 'Could not find a user with that email.';
       } else if (error.toString().contains('INVALID_PASSWORD')) {
-        errorMessage = 'Invalid Password';
-      } else {
-        errorMessage;
+        errorMessage = 'Invalid password.';
       }
-      _showDialog(errorMessage);
+      _showErrorDialog(errorMessage);
+    } catch (error) {
+      const errorMessage =
+          'Could not authenticate you. Please try again later.';
+      _showErrorDialog(errorMessage);
     }
 
     setState(() {
@@ -189,7 +195,7 @@ class _AuthCardState extends State<AuthCard> {
       child: Container(
         height: _authMode == AuthMode.Signup ? 320 : 260,
         constraints:
-        BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 320 : 260),
+            BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 320 : 260),
         width: deviceSize.width * 0.75,
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -204,7 +210,6 @@ class _AuthCardState extends State<AuthCard> {
                     if (value.isEmpty || !value.contains('@')) {
                       return 'Invalid email!';
                     }
-                    return null;
                   },
                   onSaved: (value) {
                     _authData['email'] = value;
@@ -226,15 +231,14 @@ class _AuthCardState extends State<AuthCard> {
                 if (_authMode == AuthMode.Signup)
                   TextFormField(
                     enabled: _authMode == AuthMode.Signup,
-                    decoration:
-                    const InputDecoration(labelText: 'Confirm Password'),
+                    decoration: const InputDecoration(labelText: 'Confirm Password'),
                     obscureText: true,
                     validator: _authMode == AuthMode.Signup
                         ? (value) {
-                      if (value != _passwordController.text) {
-                        return 'Passwords do not match!';
-                      }
-                    }
+                            if (value != _passwordController.text) {
+                              return 'Passwords do not match!';
+                            }
+                          }
                         : null,
                   ),
                 const SizedBox(
@@ -248,17 +252,16 @@ class _AuthCardState extends State<AuthCard> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30.0, vertical: 8.0),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 30.0, vertical: 8.0),
                     color: Theme.of(context).primaryColor,
                     textColor: Theme.of(context).primaryTextTheme.button.color,
                     child:
-                    Text(_authMode == AuthMode.Login ? 'LOGIN' : 'SIGN UP'),
+                        Text(_authMode == AuthMode.Login ? 'LOGIN' : 'SIGN UP'),
                   ),
                 FlatButton(
                   onPressed: _switchAuthMode,
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 30.0, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 4),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   textColor: Theme.of(context).primaryColor,
                   child: Text(
